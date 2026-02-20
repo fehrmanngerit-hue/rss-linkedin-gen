@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // USER, ADMIN
+  bio       String?  // "Über mich"
+  tone      String?  @default("authentisch, nahbar")
+  targetLength Int?  @default(1500)
+  emojiLevel   String? @default("keine") // viel, wenig, keine
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  feeds     Feed[]
+  keywords  Keyword[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model Feed {
+  id            String    @id @default(cuid())
+  url           String
+  name          String?
+  userId        String
+  lastScannedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articles Article[]
+}
+
+model Keyword {
+  id        String   @id @default(cuid())
+  term      String
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id            String   @id @default(cuid())
+  title         String
+  link          String   @unique
+  summary       String?
+  status        String   @default("NEW") // NEW, POSTED, DISMISSED
+  generatedPost String?  // Store the AI-generated LinkedIn post
+  publishedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  feedId String
+  feed   Feed   @relation(fields: [feedId], references: [id], onDelete: Cascade)
+}

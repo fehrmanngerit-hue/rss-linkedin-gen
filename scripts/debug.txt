@@ -1,0 +1,7 @@
+import 'dotenv/config';
+import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite } from '@prisma/adapter-better-sqlite3'; // Wait, need to check if it exports PrismaBetterSqlite or PrismaBetterSqlite3
+import Database from 'better-sqlite3';
+import bcrypt from 'bcryptjs';
+
+// I will fix this after reading index.js to be ensuring correctness
